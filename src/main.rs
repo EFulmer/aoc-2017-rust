@@ -11,27 +11,29 @@ fn main() {
 }
 
 fn day_1() {
-    // let input_number = args.next().unwrap();
-    let input_number = open_and_read("../input/day_1.txt");
-    // let mut buf = String::new();
-    // io::stdin().read_line(&mut buf).expect("Failed to read line");
-    let mut numbers: Vec<u32> = Vec::with_capacity(input_number.len());
-    for (i, c) in input_number.trim().char_indices() {
-        let char_digit = c.to_digit(10).unwrap();
-        numbers.push(char_digit);
-        // using buf.len() - 2 because the last character is \n
-        if i == input_number.len() - 1 {
-            numbers.insert(0, char_digit);
-        }
-    }
+    println!("Day 1:\n");
+    // Handling the "circular list" idea by appending a copy of the first digit to the end:
+    let mut input_number = open_and_read("../input/day_1.txt");
+    let first = input_number.chars()
+                            .next()
+                            .expect("Empty input found!");
+    input_number = input_number.trim()
+                               .to_string();
+    input_number.push(first);
+
+    let numbers: Vec<u32> = input_number.trim()
+                                        .chars()
+                                        .map(|c| c.to_digit(10).unwrap())
+                                        .collect();
     let rest = numbers.get(1..).unwrap();
-    let zipped: Vec<(&u32, &u32)> = numbers.iter().zip(rest.iter()).collect();
-    let mut total = 0;
-    for (a, b) in zipped {
-        if a == b {
-            total += *a;
-        }
-    }
+    let zipped = numbers.iter().zip(rest.iter());
+    let total = zipped.fold(0,
+                            |acc, (&x, &y)| if x == y { 
+                                acc + x 
+                            } else { 
+                                acc 
+                            });
+
     println!("Answer = {}", total);
 
     // part two
