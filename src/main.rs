@@ -1,23 +1,22 @@
-use std::env;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::Read;
+use std::iter::Iterator;
 
 fn main() {
     println!("Hello, world!");
+    day_1();
     day_2();
     day_4();
 }
 
-fn _day_1() {
-    let mut args = env::args();
-    // discard program name
-    args.next();
-    let input_number = args.next().unwrap();
+fn day_1() {
+    // let input_number = args.next().unwrap();
+    let input_number = open_and_read("../input/day_1.txt");
     // let mut buf = String::new();
     // io::stdin().read_line(&mut buf).expect("Failed to read line");
     let mut numbers: Vec<u32> = Vec::with_capacity(input_number.len());
-    for (i, c) in input_number.char_indices() {
+    for (i, c) in input_number.trim().char_indices() {
         let char_digit = c.to_digit(10).unwrap();
         numbers.push(char_digit);
         // using buf.len() - 2 because the last character is \n
@@ -39,7 +38,6 @@ fn _day_1() {
     let mut total_2 = 0;
     let (first, last) = numbers.get(1..).unwrap().split_at(numbers.get(1..).unwrap().len() / 2);
     let zipped_2: Vec<(&u32, &u32)> = first.iter().zip(last).collect();
-    // TODO I think there's a nicer way to do this one
     for (a, b) in zipped_2 {
         if a == b {
             total_2 += *a * 2;
@@ -56,7 +54,7 @@ fn day_2() {
     f.read_to_string(&mut text)
      .expect("Could not read from file");
 
-    let numbers: Vec<Vec<i32>> = text.lines().map(|line| {
+    let mut numbers: Vec<Vec<i32>> = text.lines().map(|line| {
         let nums: Vec<i32> = line.split_whitespace()
                                  .map(|y| y.parse::<i32>().expect("Error: non-integer found!"))
                                  .collect();
@@ -64,7 +62,7 @@ fn day_2() {
     }).collect();
 
     let mut checksum = 0;
-    for row in numbers {
+    for row in numbers.iter() {
         let max = row.iter().max_by(|x, y| x.cmp(y))
                      .expect("Error: empty row found!");
 
@@ -73,7 +71,30 @@ fn day_2() {
 
         checksum += max - min;
     }
-    println!("Day 2 answer = {:?}", checksum)
+    println!("Day 2 answer = {:?}", checksum);
+
+    // part 2
+    // numbers.iter().for_each(|&mut row| row.sort());
+    for row in numbers.iter_mut() {
+        row.sort();
+    }
+    let mut checksum_2 = 0;
+    for row in numbers.iter() {
+        for pair in all_pairs(&row).iter().filter(|t| t.0 != t.1 && t.0 % t.1 == 0) {
+            checksum_2 += pair.0 / pair.1;
+        }
+    }
+    println!("Day 2 part 2 answer = {:?}", checksum_2);
+}
+
+fn all_pairs<T: Copy>(v: &Vec<T>) -> Vec<(T, T)> {
+    let mut result = Vec::with_capacity(v.len());
+    for (i, val) in v.iter().enumerate() {
+        for val_2 in v.iter().skip(i) {
+            result.push((*val, *val_2));
+        }
+    }
+    result
 }
 
 /// Helper function to read the input and return the entire text as a String.
