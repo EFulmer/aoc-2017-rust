@@ -104,12 +104,26 @@ fn day_4() {
     let text = open_and_read("../input/day_4.txt");
     let passphrases = text.lines();
     let mut unique_count = 0;
-    for passphrase in passphrases {
+
+    unique_count = day_4_helper(&text, false);
+    println!("Day 4 answer = {:?}", unique_count);
+
+    unique_count = day_4_helper(&text, true);
+    println!("Day 4 part 2 answer = {:?}", unique_count);
+}
+
+fn day_4_helper(input: &String, check_anagrams: bool) -> u32 {
+    let mut unique_count = 0;
+    for passphrase in input.lines() {
         let words = passphrase.split_whitespace();
         let mut word_set = HashSet::new();
         let mut unique = true;
         for word in words {
-            unique = unique && !word_set.contains(word);
+            let mut word: Vec<u8> = word.to_string().into_bytes();
+            if check_anagrams {
+                word.sort();
+            }
+            unique = unique && !word_set.contains(&word);
             if !unique {
                 break;
             }
@@ -119,5 +133,5 @@ fn day_4() {
             unique_count += 1;
         }
     }
-    println!("Day 4 answer = {:?}", unique_count);
+    unique_count
 }
