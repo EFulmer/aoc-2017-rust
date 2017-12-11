@@ -27,24 +27,15 @@ fn day_1() {
                                         .collect();
     let rest = numbers.get(1..).unwrap();
     let zipped = numbers.iter().zip(rest.iter());
-    let total = zipped.fold(0,
-                            |acc, (&x, &y)| if x == y { 
-                                acc + x 
-                            } else { 
-                                acc 
-                            });
+    let total = zipped.fold(0, |acc, (&x, &y)| if x == y { acc + x } else { acc });
 
     println!("Answer = {}", total);
 
     // part two
-    let mut total_2 = 0;
     let (first, last) = numbers.get(1..).unwrap().split_at(numbers.get(1..).unwrap().len() / 2);
-    let zipped_2: Vec<(&u32, &u32)> = first.iter().zip(last).collect();
-    for (a, b) in zipped_2 {
-        if a == b {
-            total_2 += *a * 2;
-        }
-    }
+    let total_2 = first.iter()
+                        .zip(last)
+                        .fold(0, |acc, (&x, &y)| if x == y { acc + x*2 } else { acc });
     println!("Answer for part 2 = {}", total_2);
 }
 
